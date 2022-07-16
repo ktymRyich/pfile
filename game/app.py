@@ -4,7 +4,7 @@ import player
 
 class App:
     def __init__(self):
-        pyxel.init(120, 80, caption="Hello World!")
+        pyxel.init(120, 80)
         self.map = gamemap.GameMap()
         self.player = player.Player(self.map)
         pyxel.cls(0)

@@ -12,30 +12,36 @@ class Player:
         self.dir = DIRTYPE_LEFT
         self.speed = 1
 
-        self.w = 4
-        self.h = 4
+        self.w = 6
+        self.h = 6
         self.mapDelegate = mapDelegate
         self.posX = self.x + self.w / 2
         self.posY = self.y + self.h / 2
 
     def update(self):
         if pyxel.btn(pyxel.KEY_A):
+            self.dir = DIRTYPE_LEFT
             if self.x >= self.speed:
                 if not self.checkWall():
                     self.x -= self.speed
-            self.dir = DIRTYPE_LEFT
         if pyxel.btn(pyxel.KEY_D):
-            if self.x <= pyxel.width - self.w - self.speed:
-                self.x += self.speed
             self.dir = DIRTYPE_RIGHT
+            if self.x <= pyxel.width - self.w - self.speed:
+                if not self.checkWall():
+                    self.x += self.speed
         if pyxel.btn(pyxel.KEY_W):
-            if self.y >= self.speed:
-                self.y -= self.speed
             self.dir = DIRTYPE_UP
+            if self.y >= self.speed:
+                if not self.checkWall():
+                    self.y -= self.speed
         if pyxel.btn(pyxel.KEY_S):
-            if self.y <= pyxel.height - self.h - self.speed:
-                self.y += self.speed
             self.dir = DIRTYPE_DOWN
+            if self.y <= pyxel.height - self.h - self.speed:
+                if not self.checkWall():
+                    self.y += self.speed
+
+        if pyxel.btn(pyxel.KEY_SPACE):
+            self.checkWall()
 
         self.posX = self.x + self.w / 2
         self.posY = self.y + self.h / 2

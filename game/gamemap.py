@@ -8,19 +8,18 @@ class GameMap:
     def __init__(self):
         self.width = 12
         self.height = 8
-        print(self.height)
         self.tiles = self.initialize_tiles()
 
     def initialize_tiles(self):
         tileData = [
-            [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
-            [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
-            [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
+            [1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
+            [0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1],
+            [0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1],
-            [0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1],
-            [0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1],
+            [0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1],
+            [0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0],
+            [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
         ]
         tiles = [[self.Tile(tileData[y][x], x, y) for y in range(self.height)] for x in range(self.width)]
         return tiles
@@ -34,17 +33,45 @@ class GameMap:
                 self.tiles[x][y].draw()
 
     def checkWall(self, p):
-        tx, ty = self.convartToTilePosition(p.x, p.y)
-        print(tx, ty)
-        x, y = self.convartToPyxelPosition(tx, ty)
-        currentTile = self.tiles[tx][ty]
-
         if p.dir == player.DIRTYPE_LEFT:
+            tx1, ty1 = self.convartToTilePosition(p.x, p.y)
+            tx2, ty2 = self.convartToTilePosition(p.x, p.y + p.h -1)
+            currentTile1 = self.tiles[tx1][ty1]
             wallX = 0
-            if tx > 0:
-                if self.tiles[tx - 1][ty].type == TYPE_WALL:
-                    wallX = currentTile.getLeft()
+            if tx1 > 0:
+                if (self.tiles[tx1 - 1][ty1].type == TYPE_WALL) or (self.tiles[tx2 - 1][ty2].type == TYPE_WALL):
+                    wallX = currentTile1.getLeft()
             return True if p.x <= wallX else False
+
+        elif p.dir == player.DIRTYPE_RIGHT:
+            tx1, ty1 = self.convartToTilePosition(p.x + p.w - 1, p.y)
+            tx2, ty2 = self.convartToTilePosition(p.x + p.w - 1, p.y + p.h - 1)
+            currentTile1 = self.tiles[tx1][ty1]
+            wallX = pyxel.width
+            if tx1 < self.width - 1:
+                if (self.tiles[tx1 + 1][ty1].type == TYPE_WALL) or self.tiles[tx2 + 1][ty2].type == TYPE_WALL:
+                    wallX = currentTile1.getRight()
+            return True if p.x + p.w >= wallX else False
+
+        elif p.dir == player.DIRTYPE_UP:
+            tx1, ty1 = self.convartToTilePosition(p.x, p.y)
+            tx2, ty2 = self.convartToTilePosition(p.x + p.w - 1, p.y)
+            currentTile = self.tiles[tx1][ty1]
+            wallY = 0
+            if ty1 > 0:
+                if self.tiles[tx1][ty1 - 1].type == TYPE_WALL or self.tiles[tx2][ty2 - 1].type == TYPE_WALL:
+                    wallY = currentTile.getTop()
+            return True if p.y <= wallY else False
+
+        elif p.dir == player.DIRTYPE_DOWN:
+            tx1, ty1 = self.convartToTilePosition(p.x, p.y + p.h - 1)
+            tx2, ty2 = self.convartToTilePosition(p.x + p.w - 1, p.y + p.h - 1)
+            currentTile = self.tiles[tx1][ty1]
+            wallY = pyxel.height
+            if ty1 < self.height - 1:
+                if self.tiles[tx1][ty1 + 1].type == TYPE_WALL or self.tiles[tx2][ty2 + 1].type == TYPE_WALL:
+                    wallY = currentTile.getBottom()
+            return True if p.y + p.h >= wallY else False
 
     def convartToTilePosition(self, x, y):
         return int (x / self.Tile.width), int(y / self.Tile.height)
